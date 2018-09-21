@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MemberDao">
+
+	<insert id="insertMember" parameterType="MemberVO">
+		INSERT INTO MEMBERS (
+								EMAIL
+								, NAME
+								, PASSWORD
+		)
+		VALUES (
+								#{email}
+								, #{name}
+								, #{password}
+		)
+	</insert>
+	
+	<select id="selectOneMember" parameterType="MemberVO" resultType="MemberVO">
+		SELECT 	EMAIL
+				, NAME
+				, PASSWORD
+				, POINT
+		FROM 	MEMBERS
+		WHERE 	EMAIL = #{email}
+		AND 	PASSWORD = #{password}
+	</select>
+	
+	<update id="updatePoint" parameterType="map">
+		UPDATE	MEMBERS
+		SET		POINT = POINT + #{point}
+		WHERE	EMAIL = #{email}
+	</update>
+	
+	<select id="isBlockUser" parameterType="string" resultType="integer">
+		SELECT	NVL(LOGIN_FAIL_COUNT, 0) LOGIN_FAIL_COUNT
+		FROM	MEMBERS
+		WHERE	EMAIL = #{userId}
+		AND		LATEST_LOGIN + 1/24 >= SYSDATE
+	</select>
+	
+	<update id="unBlockUser" parameterType="string" >
+		UPDATE	MEMBERS
+		SET		LOGIN_FAIL_COUNT = 0
+		WHERE	EMAIL = #{userId}
+	</update>
+	
+	<update id="increaseLoginFailCount" parameterType="string">
+		UPDATE	MEMBERS
+		SET		LOGIN_FAIL_COUNT = LOGIN_FAIL_COUNT + 1
+				, LATEST_LOGIN = SYSDATE
+		WHERE	EMAIL = #{userId}
+	</update>
+
+</mapper>
+  
